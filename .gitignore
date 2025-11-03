@@ -1,0 +1,8 @@
+# 컴파일 결과물이 있는 build/ 폴더 전체를 무시
+build/
+
+# 소스 폴더에 실수로 생성될 수 있는 실행 파일 및 중간 파일 무시
+*.o
+my_sender
+my_program
+lora_sender
