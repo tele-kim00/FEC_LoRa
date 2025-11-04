@@ -6,6 +6,8 @@
 #include <RaptorQ/RaptorQ_v1_hdr.hpp>       // RaptorQ Library
 #include <cstdio>
 
+#include "base64.h"
+
 void print_hex(const std::string& title, const std::vector<uint8_t>& data)
 {
     std::cout << "--- " << title << " ---" << std::endl;
@@ -70,9 +72,9 @@ int main()
     }
 
     // Source Symbol 생성 및 출력
-    std::cout<< "--- Source Symbols (first 5) ---" << std::endl;
+    std::cout<< "--- Source Symbols [first 2] ---" << std::endl << std::endl;
     auto src_it = encoder.begin_source();
-    for(uint32_t i=0; i < 5 && i < num_source_symbols; ++i, ++src_it){
+    for(uint32_t i=0; i < 2 && i < num_source_symbols; ++i, ++src_it){
 
         uint32_t current_id = (*src_it).id();
         std::vector<uint8_t> payload(symbol_size);
@@ -89,13 +91,20 @@ int main()
         final_packet.insert(final_packet.end(), id_bytes, id_bytes + 4);
         final_packet.insert(final_packet.end(), payload.begin(), payload.end());
 
-        print_hex("Source Symbol (ID)" + std::to_string(current_id) + ")", final_packet);
+        // Base64 가공 전 Data
+        print_hex("Source Symbol [ID " + std::to_string(current_id) + "]", final_packet);
+
+        // Base64 Encoding and Data size difine
+        std::string base64_output = base64_encode(final_packet.data(), final_packet.size());
+
+	std::cout << "Base64 Size: " << base64_output.length() << " Bytes" << std::endl;
+        std::cout << "Base64 String: " << base64_output << std::endl << std::endl;
     }
 
     // Repair Symbol 생성 및 출력
-    std::cout << "--- Repair Symbols (first 5) ---" << std::endl;
+    std::cout << "--- Repair Symbols [first 2] ---" << std::endl << std::endl;
     auto repair_it = encoder.begin_repair();
-    for (int i =0; i < 5; ++i, ++repair_it)
+    for (int i =0; i < 2; ++i, ++repair_it)
     {
 
         uint32_t current_id = (*repair_it).id();
@@ -113,9 +122,18 @@ int main()
         final_packet.insert(final_packet.end(), id_bytes, id_bytes + 4);
         final_packet.insert(final_packet.end(), payload.begin(), payload.end());
 
-        print_hex("Repair Symbol (ID)" + std::to_string(current_id) + ")", final_packet);
+        // Base64 가공 전 Data
+        print_hex("Repair Symbol [ID " + std::to_string(current_id) + "]", final_packet);
+
+        // Base64 Encoding and Data size difine
+        std::string base64_output = base64_encode(final_packet.data(), final_packet.size());
+
+	std::cout << "Base64 Size: " << base64_output.length() << " Bytes" << std::endl;
+        std::cout << "Base64 String: " << base64_output << std::endl << std::endl;
     }
 
 
     return 0;
 }
+
+
