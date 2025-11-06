@@ -9,26 +9,12 @@
 
 #include "base64.h"
 
-void print_hex(const std::string& title, const std::vector<uint8_t>& data)
-{
-    std::cout << "--- " << title << " ---" << std::endl;
-    std::cout << "Total Packet Size: " << data.size() << " Bytes" << std::endl;
-    printf("HEX Data: ");
-    for (size_t i = 0; i< data.size(); ++i){
-        if (i == 4) {printf("| "); }
-        if (i > 0 && i % 16 == 0 && i !=4) {printf("\n       ");}
-        printf("%02x ", data[i]);
-    }
-    std::cout << std::endl << std::endl; 
-}
-
 int main()
 {
-    std::cout << "--- [TEST 1: CORRECT] Encoding(ID + Payload) to File  ---" << std::endl;
+    std::cout << "--- [TEST 2: INCORRECT] Encoding(Payload only) ---" << std::endl;
 
-    // Encoded Data File Create
-    const std::string output_filename = "../data/encoded_correct.txt";
-
+    const std::string output_filename = "../data/encoded_incorrect.txt";
+    
     // step1: File Input
     const std::string filename = "../data/sample_data.txt";
     std::ifstream file(filename, std::ios::binary);
@@ -75,58 +61,45 @@ int main()
         return 1;
     }
 
-    uint32_t num_repair_symbols = static_cast<uint32_t>(ceil(num_source_symbols * (overhead_ratio / 100.0)));
+    uint32_t num_repair_symbols = static_cast<uint32_t>(ceil(num_source_symbols * (overhead_ratio/100)));
     uint32_t total_symbols_to_send = num_source_symbols + num_repair_symbols;
 
-    // File Output Stream
     std::ofstream output_file(output_filename);
-    if (!output_file){
-	std::cerr << "Error: Cannot open file" << output_filename << std::endl;
-	return 1;
+    if(!output_file){
+        std::cerr << "Error: Cannot open file" << std::endl;
+        return 1;
     }
 
-    std::cout << "Saving " << total_symbols_to_send << " (ID+Payload) packets to " << output_filename << "..." << std::endl;
+    std::cout << "Saving" << total_symbols_to_send << " (Payload Only) packets to " << output_filename << "..." << std::endl;
 
     auto src_it = encoder.begin_source();
     auto repair_it = encoder.begin_repair();
 
-    for (uint32_t i=0; i < total_symbols_to_send; ++i){
+    for (uint32_t i = 0; i < total_symbols_to_send; ++i){
+        uint32_t current_id;
 
-	uint32_t current_id;
-	std::vector<uint8_t> payload(symbol_size);
-	auto out_it = payload.begin();
+        std::vector<uint8_t> payload(symbol_size);
+        auto out_it = payload.begin();
 
-	if(i < num_source_symbols){
-		current_id = (*src_it).id();
-		(*src_it)(out_it, payload.end());
-		++src_it;
-	}
-	else {
-		current_id = (*repair_it).id();
-		(*repair_it)(out_it, payload.end());
-		++repair_it;
-	}
+        if (i < num_source_symbols){
+            current_id = (*src_it).id();
+            (*src_it)(out_it, payload.end());
+            ++src_it;
+        }
+        else{
+            current_id = (*repair_it).id();
+            (*repair_it)(out_it, payload.end());
+            ++repair_it;
+        }
 
+        std::string base64_output = base64_encode(payload.data(), payload.size());
 
-	// [ID 4바이트] + [페이로드] 결합
-        uint8_t id_bytes[4];
-        id_bytes[0] = (current_id >> 24) & 0xFF;
-        id_bytes[1] = (current_id >> 16) & 0xFF;
-        id_bytes[2] = (current_id >> 8) & 0xFF;
-        id_bytes[3] = (current_id >> 0) & 0xFF;
-        std::vector<uint8_t> final_packet;
-        final_packet.insert(final_packet.end(), id_bytes, id_bytes + 4);
-        final_packet.insert(final_packet.end(), payload.begin(), payload.end());
-
-	std::string base64_output = base64_encode(final_packet.data(), final_packet.size());
-
-	output_file << base64_output << "\n";
+        output_file << base64_output << "\n";
     }
 
     output_file.close();
-    std::cout << "File saved successfully" << std::endl;
+    std::cout << "File saved Sucessfully" << std::endl;
 
     return 0;
 }
-
 

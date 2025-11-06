@@ -70,6 +70,18 @@ add_executable(FEC_base64
 
 
 
+# ===================================================================
+# ----------------FEC-Base64_Data(Non-ID) Analysis-------------------
+#
+add_executable(FEC_less
+    src/FEC_less.cpp
+    ${SHARED_SOURCES}
+)
+#
+#
+# ===================================================================
+
+
 
 # ===================================================================
 # 4. 라이브러리 링크
@@ -78,6 +90,12 @@ add_executable(FEC_base64
 # "base64_analysis"와 "lora_sender" 두 프로그램 모두에게
 # libRaptorQ 라이브러리를 링크합니다. (-lRaptorQ, 대소문자 주의)
 target_link_libraries(FEC_base64
+    RaptorQ
+    pthread
+)
+
+# Non-ID FEC-Base64
+target_link_libraries(FEC_less
     RaptorQ
     pthread
 )
