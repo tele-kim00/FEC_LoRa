@@ -58,10 +58,15 @@ set(SHARED_SOURCES
 
 
 # ===================================================================
-# --------------------FEC-Base64_Data Analysis-----------------------
+# -----------------------FEC-Base64_Data(ID)-------------------------
 #
 add_executable(FEC_base64
     src/FEC_base64.cpp
+    ${SHARED_SOURCES}
+)
+
+add_executable(FEC_decoder
+    src/txt_decode.cpp
     ${SHARED_SOURCES}
 )
 #
@@ -71,10 +76,52 @@ add_executable(FEC_base64
 
 
 # ===================================================================
-# ----------------FEC-Base64_Data(Non-ID) Analysis-------------------
+# ---------------------FEC-Base64_Data(Non-ID)-----------------------
 #
 add_executable(FEC_less
     src/FEC_less.cpp
+    ${SHARED_SOURCES}
+)
+
+add_executable(FEC_decoder_non
+    src/no_id.cpp
+    ${SHARED_SOURCES}
+)
+#
+#
+# ===================================================================
+
+
+
+
+# ===================================================================
+# -----------------------FEC-Base64_Image(ID)------------------------
+#
+add_executable(FEC_image_encode
+    src/FEC_image_encode.cpp
+    ${SHARED_SOURCES}
+)
+
+add_executable(FEC_image_decode
+    src/FEC_image_decode.cpp
+    ${SHARED_SOURCES}
+)
+#
+#
+# ===================================================================
+
+
+
+# ===================================================================
+# ---------------------FEC-Base64_Image(non_ID)----------------------
+#
+add_executable(image_encode_non
+    src/image_encode_non.cpp
+    ${SHARED_SOURCES}
+)
+
+add_executable(image_decode_non
+    src/image_decode_non.cpp
     ${SHARED_SOURCES}
 )
 #
@@ -89,13 +136,57 @@ add_executable(FEC_less
 
 # "base64_analysis"와 "lora_sender" 두 프로그램 모두에게
 # libRaptorQ 라이브러리를 링크합니다. (-lRaptorQ, 대소문자 주의)
+
+# ID FEC-Base64 (Text_Data)
 target_link_libraries(FEC_base64
     RaptorQ
     pthread
 )
 
-# Non-ID FEC-Base64
+target_link_libraries(FEC_decoder
+    RaptorQ
+    pthread
+)
+# -------------------------------
+
+
+
+# Non-ID FEC-Base64 (Text_Data)
 target_link_libraries(FEC_less
     RaptorQ
     pthread
 )
+
+target_link_libraries(FEC_decoder_non
+    RaptorQ
+    pthread
+)
+# -------------------------------
+
+
+
+# ID FEC-Base64 (Image_Data)
+target_link_libraries(FEC_image_encode
+    RaptorQ
+    pthread
+)
+
+target_link_libraries(FEC_image_decode
+    RaptorQ
+    pthread
+)
+# ------------------------------
+
+
+
+# Non-ID FEC-Base64 (Image_Data)
+target_link_libraries(image_encode_non
+    RaptorQ
+    pthread
+)
+
+target_link_libraries(image_decode_non
+    RaptorQ
+    pthread
+)
+# ------------------------------
